@@ -1,70 +1,95 @@
-
-// Echoes in the Hall
-// Part 1A
-
-console.log("Echoes in the Hall loaded!");
-
-const playButton = document.getElementById("playButton");
-const menu = document.getElementById("menu");
-const hud = document.getElementById("hud");
-const loading = document.getElementById("loading");
-
 playButton.addEventListener("click", () => {
     menu.style.display = "none";
     hud.style.display = "block";
-    loading.textContent = "Entering the school...";
+    loading.style.display = "none";
+
+    startSchool();
 });
-// Part 2A - Game Setup
+// Echoes in the Hall
+// Part 1B - 3D Scene Setup
 
-const canvas = document.createElement("canvas");
-const ctx = canvas.getContext("2d");
+import * as THREE from "three";
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+let scene;
+let camera;
+let renderer;
 
-document.body.appendChild(canvas);
+function startSchool() {
 
-let player = {
-    x: canvas.width / 2,
-    y: canvas.height / 2,
-    size: 20,
-    speed: 5
-};
+    // Create scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050505);
 
-let keys = {};
+    // Create camera
+    camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+    );
 
-document.addEventListener("keydown", (event) => {
-    keys[event.key.toLowerCase()] = true;
-});
+    // Create renderer
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
 
-document.addEventListener("keyup", (event) => {
-    keys[event.key.toLowerCase()] = false;
-});
+    document.body.appendChild(renderer.domElement);
 
-function updatePlayer() {
-    if (keys["w"]) player.y -= player.speed;
-    if (keys["s"]) player.y += player.speed;
-    if (keys["a"]) player.x -= player.speed;
-    if (keys["d"]) player.x += player.speed;
+    // Camera position
+    camera.position.set(0, 2, 5);
+
+    // Add light
+    const light = new THREE.AmbientLight(
+        0xffffff,
+        0.5
+    );
+
+    scene.add(light);
+
+    // Create floor
+    const floorGeometry = new THREE.PlaneGeometry(
+        20,
+        20
+    );
+
+    const floorMaterial = new THREE.MeshBasicMaterial({
+        color: 0x222222
+    });
+
+    const floor = new THREE.Mesh(
+        floorGeometry,
+        floorMaterial
+    );
+
+    floor.rotation.x = -Math.PI / 2;
+
+    scene.add(floor);
+
+    animate();
 }
 
-function drawPlayer() {
-    ctx.fillStyle = "white";
-    ctx.fillRect(
-        player.x,
-        player.y,
-        player.size,
-        player.size
+
+// Game loop
+function animate() {
+
+    requestAnimationFrame(animate);
+
+    renderer.render(
+        scene,
+        camera
     );
 }
+// Echoes in the Hall
+// Part 1C - Start Game Connection
 
-function gameLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+playButton.addEventListener("click", () => {
 
-    updatePlayer();
-    drawPlayer();
+    menu.style.display = "none";
+    hud.style.display = "block";
+    loading.style.display = "none";
 
-    requestAnimationFrame(gameLoop);
-}
+    startSchool();
 
-gameLoop();
+});
